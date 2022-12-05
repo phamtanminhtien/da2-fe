@@ -13,7 +13,7 @@ function Home() {
     <div className="h-full w-full">
       <div className="flex h-full w-full flex-col relative z-20">
         <div className="flex justify-center items-center flex-1">
-          <div className="">T2Study</div>
+          <div className="">T2Study ❤️</div>
         </div>
         <div className="flex-1 p-8 flex justify-end flex-col gap-4">
           <Link
