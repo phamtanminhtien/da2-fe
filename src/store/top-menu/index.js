@@ -6,6 +6,8 @@ const topMenuSlice = createSlice({
     show: false,
     title: "Home",
     back: true,
+    leftText: "",
+    leftLink: "/",
     rightText: "SignIn",
     rightLink: "/signin",
   },
@@ -14,6 +16,8 @@ const topMenuSlice = createSlice({
       state.show = true;
       state.title = action.payload.title;
       state.back = action.payload.back;
+      state.leftText = action.payload.leftText;
+      state.leftLink = action.payload.leftLink;
       state.rightText = action.payload.rightText;
       state.rightLink = action.payload.rightLink;
     },

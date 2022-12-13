@@ -7,10 +7,12 @@ function Register() {
   useEffect(() => {
     dispatch(
       showTopMenu({
-        title: "Register",
+        title: "Sign Up",
         back: true,
-        rightText: "Login",
-        rightLink: "/login",
+        leftText: "",
+        leftLink: "/",
+        rightText: "Sign In",
+        rightLink: "/signin",
       })
     );
   });

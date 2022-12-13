@@ -5,11 +5,15 @@ function Menu({ data }) {
   const history = useHistory();
 
   return (
-    <div className="h-32 items-center flex p-8 justify-between relative">
+    <div className="w-full h-32 items-center flex p-8 justify-between relative">
       <div
         className="rounded-full bg-gray-300 w-12 h-12 flex justify-center items-center"
         onClick={() => {
-          history.goBack();
+          if (data.leftText === "") {
+            history.goBack();
+          } else {
+            history.push("/dashboard" + data.leftLink);
+          }
         }}
       >
         <svg
@@ -25,11 +29,13 @@ function Menu({ data }) {
           />
         </svg>
       </div>
+
       {data.title && (
         <div className="text-3xl font-bold absolute left-1/2 -translate-x-1/2">
           {data.title}
         </div>
       )}
+
       <div className="">
         <Link to={data.rightLink} className="font-bold text-red-500">
           {data.rightText}

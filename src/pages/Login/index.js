@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { showTopMenu } from "../../store/top-menu";
@@ -6,13 +6,57 @@ import { showTopMenu } from "../../store/top-menu";
 function Login() {
   const dispatch = useDispatch();
   const history = useHistory();
+  const [account, setAccount] = useState({
+    username: "",
+    password: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [valid, setValid] = useState({
+    username: true,
+    password: true,
+  });
+
+  const onHandlerUsername = (e) => {
+    setAccount({ ...account, username: e.target.value });
+    setValid({ ...valid, username: true });
+  };
+
+  const onHandlerPassword = (e) => {
+    setAccount({ ...account, password: e.target.value });
+    setValid({ ...valid, password: true });
+  };
+
+  const onHandlerSubmitted = () => {
+    console.log(
+      "username: " + account.username + " password: " + account.password
+    );
+
+    if (account.username && account.password) {
+      console.log("Submitted");
+      setSubmitted(true);
+      history.push("/dashboard/home");
+    } else if (!account.username && !account.password) {
+      setValid({ username: false, password: false });
+    } else {
+      if (!account.username) {
+        console.log("username is empty ");
+        setValid({ ...valid, username: false });
+      }
+      if (!account.password) {
+        setValid({ ...valid, password: false });
+      }
+    }
+  };
+
   useEffect(() => {
     dispatch(
       showTopMenu({
-        title: "Login",
+        title: "Sign In",
         back: true,
-        rightText: "Register",
-        rightLink: "/register",
+        leftText: "",
+        leftLink: "/",
+        rightText: "Sign Up",
+        rightLink: "/signup",
       })
     );
   });
@@ -27,18 +71,24 @@ function Login() {
         <input
           className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
           placeholder="Email"
+          onChange={onHandlerUsername}
         />
+        {!valid.username && !submitted ? (
+          <p className="pt-1 text-xs text-red-600">Please input username</p>
+        ) : null}
         <input
           className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
           placeholder="Password"
+          onChange={onHandlerPassword}
         />
+        {!valid.password && !submitted ? (
+          <p className="pt-1 text-xs text-red-600">Please input password</p>
+        ) : null}
       </div>
       <div className="flex-1 flex justify-center items-center">
         <div
           className="w-24 h-24 bg-gray-300 rounded-full flex justify-center items-center"
-          onClick={() => {
-            history.push("/dashboard/setting");
-          }}
+          onClick={onHandlerSubmitted}
         >
           <svg
             width="42"
