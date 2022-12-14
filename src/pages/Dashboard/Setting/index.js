@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
+import avatarPng from "../../../assets/avatar.jpg";
 
 function Setting() {
   const dispatch = useDispatch();
@@ -9,19 +11,17 @@ function Setting() {
       showTopMenu({
         title: "Setting",
         back: true,
+        leftText: "home",
+        leftLink: "/home",
         rightText: "",
       })
     );
   });
   return (
-    <div className="flex-1 flex justify-between flex-col">
+    <div className="flex-1 flex flex-col gap-4">
       <div className="flex items-center flex-col gap-2">
-        <div className="w-36 h-36">
-          <img
-            src="https://scontent.fsgn5-11.fna.fbcdn.net/v/t39.30808-6/277582080_1876862849368329_5479452429661100688_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=SlSKjEm1CJcAX-3SbMt&_nc_ht=scontent.fsgn5-11.fna&oh=00_AfDXW9jAj_-sA1ObrxtAlUFGZb2UWHYwuxT0CqxVIFdQ1A&oe=6390CF73"
-            className="rounded-full"
-            alt="avatar"
-          ></img>
+        <div className="w-36 h-36 bg-[#FF406E] rounded-full">
+          <img src={avatarPng} className="rounded-full" alt="avatar"></img>
         </div>
         <h2 className="text-lg font-semibold text-[#FF406E]">Minh Tien</h2>
       </div>
@@ -39,7 +39,9 @@ function Setting() {
           />
         </svg>
 
-        <span>LogOut</span>
+        <Link to="/">
+          <span>LogOut</span>
+        </Link>
       </div>
     </div>
   );
