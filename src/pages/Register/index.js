@@ -7,7 +7,7 @@ function Register() {
   useEffect(() => {
     dispatch(
       showTopMenu({
-        title: "Sign Up B",
+        title: "Sign Up",
         back: true,
         leftText: "",
         leftLink: "/",
