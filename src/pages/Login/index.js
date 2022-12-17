@@ -51,7 +51,7 @@ function Login() {
   useEffect(() => {
     dispatch(
       showTopMenu({
-        title: "Sign In a",
+        title: "Sign In",
         back: true,
         leftText: "",
         leftLink: "/",
