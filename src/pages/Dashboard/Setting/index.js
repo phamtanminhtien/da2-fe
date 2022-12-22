@@ -1,11 +1,14 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
 import avatarPng from "../../../assets/avatar.jpg";
+import { logout } from "../../../store/auth";
 
 function Setting() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+
   useEffect(() => {
     dispatch(
       showTopMenu({
@@ -23,9 +26,14 @@ function Setting() {
         <div className="w-36 h-36 bg-[#FF406E] rounded-full">
           <img src={avatarPng} className="rounded-full" alt="avatar"></img>
         </div>
-        <h2 className="text-lg font-semibold text-[#FF406E]">Minh Tien</h2>
+        <h2 className="text-lg font-semibold text-[#FF406E]">{user?.name}</h2>
       </div>
-      <div className="p-8 flex gap-5 border border-gray-100">
+      <div
+        className="p-8 flex gap-5 border border-gray-100 cursor-pointer"
+        onClick={() => {
+          dispatch(logout());
+        }}
+      >
         <svg
           width="24"
           height="24"
@@ -39,9 +47,7 @@ function Setting() {
           />
         </svg>
 
-        <Link to="/">
-          <span>LogOut</span>
-        </Link>
+        <span>LogOut</span>
       </div>
     </div>
   );
