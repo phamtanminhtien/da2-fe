@@ -28,6 +28,10 @@ function Login() {
         const res = await login(account);
         dispatch(loginAction(res.data));
       } catch (error) {
+        setValid({
+          username: "Invalid username",
+          password: "Invalid password",
+        });
         console.log(error);
       }
       // history.push("/dashboard/home");

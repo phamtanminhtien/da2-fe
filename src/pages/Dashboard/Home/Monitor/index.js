@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useHistory } from "react-router-dom";
-import { showTopMenu } from "../../../store/top-menu";
+import { useHistory, useParams } from "react-router-dom";
+import { showTopMenu } from "../../../../store/top-menu";
 
 function Monitor() {
+  let { id } = useParams();
+  console.log(id);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(

@@ -7,7 +7,7 @@ import Menu from "./components/TopMenu";
 import { getLocalStorageByName, STORAGE_KEYS } from "./localStorage";
 import Home from "./pages/Dashboard/Home";
 import Message from "./pages/Dashboard/Message";
-import Monitor from "./pages/Dashboard/Monitor";
+import Monitor from "./pages/Dashboard/Home/Monitor";
 import Setting from "./pages/Dashboard/Setting";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -54,7 +54,7 @@ function App() {
         <Route exact path="/signup">
           <Register />
         </Route>
-        <Route path="/dashboard">
+        <Route path="/">
           <Switch>
             <Route exact path="/dashboard/home">
               <Home />
@@ -65,7 +65,7 @@ function App() {
             <Route exact path="/dashboard/setting">
               <Setting />
             </Route>
-            <Route exact path="/dashboard/monitor">
+            <Route exact path="/dashboard/monitor/:id">
               <Monitor />
             </Route>
           </Switch>
