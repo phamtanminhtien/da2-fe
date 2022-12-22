@@ -14,7 +14,7 @@ const cameraInfoDefault = [
       "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/living-room-ideas-white-palette-1639423211.jpg",
   },
   {
-    id: "cam1",
+    id: "cam2",
     name: "CAM 2",
     status: false,
     background:
@@ -67,7 +67,7 @@ function Home() {
           <div
             onClick={() => history.push(`/dashboard/monitor/${camera.id}`)}
             cameraId={camera.id}
-            className="h-[240px] w-[360px] cursor-pointer rounded-lg border-2 border-[#FF406E] bg-cover"
+            className="h-[240px] w-full max-w-[360px] cursor-pointer rounded-lg border-2 border-[#FF406E] bg-cover"
             style={{
               backgroundImage: `url(${camera.background})`,
             }}

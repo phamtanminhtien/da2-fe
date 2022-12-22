@@ -26,9 +26,9 @@ function BottomMenu() {
   }, [history.location.pathname]);
 
   return (
-    <div className="h-18 fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-300 px-8 py-4 flex justify-between">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex h-24 items-center justify-between border-t border-gray-300 bg-white px-8 py-4">
       <Link
-        className="w-[40px] h-[40px] flex items-center justify-center rounded-md"
+        className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
           backgroundColor: currentTab === TAB[0].id ? "#FF406E" : "#fff",
           width: currentTab === TAB[0].id ? "80px" : "40px",
@@ -61,7 +61,7 @@ function BottomMenu() {
         onClick={() => {
           setCurrentTab(TAB[1].id);
         }}
-        className="w-[40px] h-[40px] flex items-center justify-center rounded-md"
+        className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
           backgroundColor: currentTab === TAB[1].id ? "#FF406E" : "#fff",
           width: currentTab === TAB[1].id ? "80px" : "40px",
@@ -90,7 +90,7 @@ function BottomMenu() {
         onClick={() => {
           setCurrentTab(TAB[2].id);
         }}
-        className="w-[40px] h-[40px] flex items-center justify-center rounded-md"
+        className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
           backgroundColor: currentTab === TAB[2].id ? "#FF406E" : "#fff",
           transition: "all 0.2s cubic-bezier(0.62, -0.09, 0.9, 1.4) 0s",

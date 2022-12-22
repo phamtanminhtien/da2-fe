@@ -63,7 +63,7 @@ function Login() {
   }, []);
 
   return (
-    <div className="mt-32 p-8 flex-1 flex flex-col">
+    <div className="mt-32 flex flex-1 flex-col p-8">
       <h1 className="text-6xl font-bold">
         Sign in
         <br />
@@ -71,7 +71,7 @@ function Login() {
       </h1>
       <div className="">
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
           placeholder="Email"
           onChange={onHandlerUsername}
         />
@@ -79,7 +79,7 @@ function Login() {
           <p className="pt-1 text-xs text-red-600">{valid.username}</p>
         ) : null}
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
           placeholder="Password"
           onChange={onHandlerPassword}
         />
@@ -87,9 +87,9 @@ function Login() {
           <p className="pt-1 text-xs text-red-600">{valid.password}</p>
         ) : null}
       </div>
-      <div className="flex-1 flex justify-center items-center">
+      <div className="flex flex-1 items-center justify-center">
         <div
-          className="w-24 h-24 bg-gray-300 rounded-full flex justify-center items-center"
+          className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-300"
           onClick={onHandlerSubmitted}
         >
           <svg
