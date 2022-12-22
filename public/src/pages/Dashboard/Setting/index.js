@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
 import avatarPng from "../../../assets/avatar.jpg";
+import { logout } from "../../../../../src/store/auth";
 
 function Setting() {
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(
       showTopMenu({
@@ -16,7 +17,8 @@ function Setting() {
         rightText: "",
       })
     );
-  });
+  }, [dispatch]);
+
   return (
     <div className="mt-32 flex flex-col gap-4">
       <div className="flex items-center flex-col gap-2">
@@ -39,9 +41,14 @@ function Setting() {
           />
         </svg>
 
-        <Link to="/">
-          <span>LogOut</span>
-        </Link>
+        <span
+          onClick={(e) => {
+            console.log("asd", e);
+            dispatch(logout());
+          }}
+        >
+          LogOut
+        </span>
       </div>
     </div>
   );
