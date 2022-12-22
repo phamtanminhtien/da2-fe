@@ -19,8 +19,12 @@ function Monitor() {
     );
   });
   return (
-    <div className="p-10 mt-32 flex-1 flex flex-row justify-start flex-wrap gap-8">
-      Monitor screen
+    <div className="mt-32 flex flex-row flex-wrap justify-center gap-8 p-10">
+      <div className="h-[240px] w-full max-w-[360px] cursor-pointer rounded-lg border-2 border-[#FF406E] bg-cover">
+        {/* Image face */}
+      </div>
+
+      <div className="w-full">Happy</div>
     </div>
   );
 }

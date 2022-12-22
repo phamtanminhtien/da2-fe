@@ -69,13 +69,13 @@ function Message() {
     );
   });
   return (
-    <div className="mt-32 p-5 flex-1 flex justify-between flex-col ">
-      <div className="px-5 py-2 bg-white fixed top-32 left-0 right-0">
-        <form className="p-1 w-full h-[60px] bg-[#D9D9D9] rounded-lg flex justify-center items-center">
-          <div className="pl-3 flex justify-center items-center font-bold">
+    <div className="mt-32 flex flex-1 flex-col justify-between p-5 ">
+      <div className="fixed top-32 left-0 right-0 bg-white px-5 py-2">
+        <form className="flex h-[60px] w-full items-center justify-center rounded-lg bg-[#D9D9D9] p-1">
+          <div className="flex items-center justify-center pl-3 font-bold">
             Room ID
           </div>
-          <select className="px-5 flex-1 h-full bg-[#D9D9D9] outline-none">
+          <select className="h-full flex-1 bg-[#D9D9D9] px-5 outline-none">
             <option value="volvo">Volvo</option>
             <option value="saab">Saab</option>
             <option value="mercedes">Mercedes</option>
@@ -84,15 +84,15 @@ function Message() {
         </form>
       </div>
 
-      <div className="mt-12 mb-32 p-2 w-full h-full gap-4 flex flex-col justify-start items-end">
+      <div className="mt-12 mb-32 flex h-full w-full flex-col items-end justify-start gap-4 p-2">
         {messages &&
           messages.map((message, index) => {
             return (
               <div className="gap-1">
-                <div className="text-right text-gray-500 text-xs">
+                <div className="text-right text-xs text-gray-500">
                   {convertTimestamp(message.timestamp)}
                 </div>
-                <div className="px-5 py-2 bg-[#D9D9D9] bg-opacity-40 rounded-xl text-right">
+                <div className="rounded-xl bg-[#D9D9D9] bg-opacity-40 px-5 py-2 text-right">
                   {message.content}
                 </div>
               </div>
@@ -100,10 +100,10 @@ function Message() {
           })}
       </div>
 
-      <div className="px-5 fixed bottom-[70px] left-0 right-0 py-2 bg-white">
-        <form className="p-1 w-full h-[60px] bg-[#D9D9D9] rounded-lg flex hover:border-2 border-[#FF406E] border-opacity-30">
-          <input className="pl-3 flex-1 h-full bg-[#D9D9D9] outline-none" />
-          <button className="p-3 flex justify-center items-center">
+      <div className="fixed bottom-24 left-0 right-0 bg-white px-5 py-2">
+        <form className="flex h-[60px] w-full rounded-lg border-[#FF406E] border-opacity-30 bg-[#D9D9D9] p-1 hover:border-2">
+          <input className="h-full flex-1 bg-[#D9D9D9] pl-3 outline-none" />
+          <button className="flex items-center justify-center p-3">
             <svg
               width="22"
               height="24"
