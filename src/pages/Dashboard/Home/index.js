@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
+import { io } from "socket.io-client";
+import { baseURL } from "../../../constants";
 
-const cameraInfo = [
+const cameraInfoDefault = [
   {
     id: "cam1",
     name: "CAM 1",
@@ -21,6 +23,8 @@ const cameraInfo = [
 ];
 
 function Home() {
+  const [cameraInfo, setCameraInfo] = useState(cameraInfoDefault);
+
   const dispatch = useDispatch();
   const history = useHistory();
   useEffect(() => {
@@ -34,6 +38,24 @@ function Home() {
       })
     );
   });
+
+  useEffect(() => {
+    const socket = io(`${baseURL}/client`, {
+      transports: ["websocket"],
+    });
+    socket.on("connect", () => {
+      console.log("connected");
+    });
+    socket.on("image", (data) => {
+      setCameraInfo(
+        cameraInfo.map((i) => ({
+          ...i,
+          background: `data:image/jpg;base64,${data}`,
+        }))
+      );
+    });
+  }, [cameraInfo]);
+
   return (
     <div className="mt-32 flex flex-1 flex-row flex-wrap items-start justify-start gap-8 p-10">
       {cameraInfo.map((camera, index) => {

@@ -1,1 +1,1 @@
-export const baseURL = "https://be.uilabs.store/";
+export const baseURL = "https://be.uilabs.store";
