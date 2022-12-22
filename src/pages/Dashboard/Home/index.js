@@ -21,7 +21,7 @@ const cameraInfoDefault = [
       "http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcR1WzIrF5RQOhpJK1A_x9NO2apTwT_5M1QgdxOoyEXyjqoNoljv3Ar0R3AszC6MqXM2rrquxUv27Kso_Ru8fNs",
   },
 ];
-
+let socket;
 function Home() {
   const [cameraInfo, setCameraInfo] = useState(cameraInfoDefault);
 
@@ -40,7 +40,7 @@ function Home() {
   });
 
   useEffect(() => {
-    const socket = io(`${baseURL}/client`, {
+    socket = io(`${baseURL}/client`, {
       transports: ["websocket"],
     });
     socket.on("connect", () => {
@@ -54,6 +54,9 @@ function Home() {
         }))
       );
     });
+    return () => {
+      socket.disconnect();
+    };
   }, [cameraInfo]);
 
   return (
