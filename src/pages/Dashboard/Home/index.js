@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
-import { io } from "socket.io-client";
+import io from "socket.io-client";
 import { baseURL } from "../../../constants";
 
 const cameraInfoDefault = [
