@@ -5,7 +5,7 @@ import { showTopMenu } from "../../../store/top-menu";
 import io from "socket.io-client";
 import { baseURL } from "../../../constants";
 
-const cameraInfoDefault = [
+export const camerasAPIDefault = [
   {
     id: "cam1",
     name: "CAM 1",
@@ -23,7 +23,7 @@ const cameraInfoDefault = [
 ];
 let socket;
 function Home() {
-  const [cameraInfo, setCameraInfo] = useState(cameraInfoDefault);
+  const [camerasAPI, setCamerasAPI] = useState(camerasAPIDefault);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -47,8 +47,8 @@ function Home() {
       console.log("connected");
     });
     socket.on("image", (data) => {
-      setCameraInfo(
-        cameraInfo.map((i) => ({
+      setCamerasAPI(
+        camerasAPI.map((i) => ({
           ...i,
           background: `data:image/jpg;base64,${data}`,
         }))
@@ -57,11 +57,11 @@ function Home() {
     return () => {
       socket.disconnect();
     };
-  }, [cameraInfo]);
+  }, [camerasAPI]);
 
   return (
     <div className="mt-32 flex flex-1 flex-row flex-wrap items-start justify-start gap-8 p-10">
-      {cameraInfo.map((camera, index) => {
+      {camerasAPI.map((camera, index) => {
         console.log(camera);
         return (
           <div

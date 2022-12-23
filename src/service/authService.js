@@ -6,3 +6,10 @@ export const login = async ({ username, password }) => {
     password,
   });
 };
+
+export const register = async ({ username, password }) => {
+  return await axios.post("/user/register", {
+    username,
+    password,
+  });
+};
