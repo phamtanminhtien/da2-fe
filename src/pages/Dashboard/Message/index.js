@@ -2,14 +2,6 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
 
-const compareTimeInDay = (timestamp) => {
-  const now = new Date.getTime();
-  const timeStartDay = now / 86400;
-  const timeEndDay = now / 86400 + 1;
-  if (timestamp >= timeStartDay && timestamp <= timeEndDay) return true;
-  else return false;
-};
-
 const convertTimestamp = (timestamp) => {
   const date = new Date(timestamp);
   let format = date.getHours() + ":" + date.getMinutes();

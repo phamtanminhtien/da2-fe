@@ -20,7 +20,6 @@ const authSlice = createSlice({
       setLocalStorage(STORAGE_KEYS.user_info, JSON.stringify(user_info));
     },
     logout: (state) => {
-      console.log("asas");
       state.user = null;
       clearLocalStorage();
     },

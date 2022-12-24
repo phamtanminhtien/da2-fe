@@ -1,4 +1,30 @@
-.App{
+.App {
   width: 100vw;
   height: 100vh;
+}
+
+.popup-content {
+  border-radius: 25px;
+  margin: auto;
+  background: rgb(255, 255, 255);
+  width: 360px;
+  padding: 20px;
+  position: relative;
+}
+
+.popup-arrow {
+  color: rgb(255, 255, 255);
+}
+
+[role="tooltip"].popup-content {
+  width: 200px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
+}
+
+.popup-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+[data-popup="tooltip"].popup-overlay {
+  background: transparent;
 }

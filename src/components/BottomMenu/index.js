@@ -26,7 +26,7 @@ function BottomMenu() {
   }, [history.location.pathname]);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex h-24 items-center justify-between border-t border-gray-300 bg-white px-8 py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex h-24 w-full items-center justify-between border-t border-gray-300 bg-white px-8 py-4">
       <Link
         className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
