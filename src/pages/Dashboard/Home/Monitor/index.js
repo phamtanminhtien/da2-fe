@@ -4,8 +4,9 @@ import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import { baseURL } from "../../../../constants";
 import { showTopMenu } from "../../../../store/top-menu";
-import { camerasAPIDefault } from "../../Home";
+// import { camerasAPIDefault } from "../../Home";
 import Popup from "reactjs-popup";
+import axios from "../../../../axios-config";
 
 const emotionsAPIDefault = [
   {
@@ -99,10 +100,10 @@ let socket;
 
 function Monitor() {
   let { id } = useParams();
-  let cameraAPIDefault = camerasAPIDefault.find((cam) => cam.id === id);
 
   const dispatch = useDispatch();
-  const [cameraAPI, setCameraAPI] = useState(cameraAPIDefault);
+  const [cameraAPI, setCameraAPI] = useState({});
+
   const [alarm, setAlarm] = useState({
     alarm: "",
     toggle: false,
@@ -121,6 +122,13 @@ function Monitor() {
     if (alarm.alarm === "") return;
     setAlarm({ ...alarm, toggle: e.target.checked });
   };
+
+  useEffect(() => {
+    (async () => {
+      const res = await axios.get(`/camera/${id}`);
+      setCameraAPI(res.data);
+    })();
+  }, [id]);
 
   useEffect(() => {
     console.log(alarm);
@@ -162,7 +170,7 @@ function Monitor() {
         <div
           className="h-[240px] w-full cursor-pointer rounded-lg border-2 border-[#FF406E] bg-cover"
           style={{
-            backgroundImage: `url(${cameraAPI.background})`,
+            backgroundImage: `url(data:image/jpg;base64,${cameraAPI.data})`,
           }}
         >
           {/* Image from camera */}
@@ -218,8 +226,6 @@ function Monitor() {
                       }
                     </ul>
                   </div>
-
-                  <div className=""></div>
                 </div>
               )}
             </Popup>
@@ -286,8 +292,6 @@ function Monitor() {
                   <div className="peer-focus:ring-red-40000 peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-0.5 after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-red-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 dark:border-gray-400 dark:bg-gray-400 dark:peer-focus:ring-red-600"></div>
                 </label>
               </div>
-
-              <div className=""></div>
             </div>
           )}
         </Popup>
