@@ -95,7 +95,7 @@ function Home() {
             <div className="header p-2 text-lg font-bold text-[#FF406E]">
               Add camera
             </div>
-            <div className="content flex h-40 w-full items-center justify-between p-5">
+            <div className="content flex h-44 w-full items-center justify-between p-5">
               <form
                 className="flex h-full w-full flex-col gap-5"
                 onSubmit={onHandlerAddCamera}
@@ -118,19 +118,10 @@ function Home() {
 
                 <div className="flex items-center justify-center">
                   <button
-                    className="rounded-full bg-[#FF406E] p-2"
+                    className="rounded-md bg-[#FF406E] p-2 text-sm text-white"
                     type="submit"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      height="48"
-                      width="48"
-                    >
-                      <path
-                        fill="#FFF"
-                        d="M18.9 35.1q-.3 0-.55-.1-.25-.1-.5-.35L8.8 25.6q-.45-.45-.45-1.1 0-.65.45-1.1.45-.45 1.05-.45.6 0 1.05.45l8 8 18.15-18.15q.45-.45 1.075-.45t1.075.45q.45.45.45 1.075T39.2 15.4L19.95 34.65q-.25.25-.5.35-.25.1-.55.1Z"
-                      />
-                    </svg>
+                    Submit
                   </button>
                 </div>
               </form>

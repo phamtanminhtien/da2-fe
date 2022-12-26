@@ -11,7 +11,7 @@ const METHOD_PATCH = "PATCH";
 function setHeaders(headers) {
   return {
     ...headers,
-    Authorization: getLocalStorageByName(STORAGE_KEYS.jwt_token),
+    Authorization: "Bearer " + getLocalStorageByName(STORAGE_KEYS.jwt_token),
   };
 }
 
