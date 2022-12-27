@@ -134,8 +134,10 @@ function Home() {
         console.log(camera);
         return (
           <div
-            onClick={() => history.push(`/dashboard/monitor/${camera.id}`)}
-            cameraId={camera.id}
+            onClick={() =>
+              history.push(`/dashboard/monitor/${camera.camera_id}`)
+            }
+            cameraId={camera.camera_id}
             className="h-[240px] w-full max-w-[360px] cursor-pointer rounded-lg border-2 border-[#FF406E] bg-cover"
             style={{
               backgroundImage: `url(data:image/jpg;base64,${camera.data})`,
@@ -149,7 +151,9 @@ function Home() {
                     : "h-2.5 w-2.5 rounded-full bg-red-500"
                 }
               ></div>
-              <div className="text-sm font-bold text-black">{camera.name}</div>
+              <div className="text-sm font-bold text-black">
+                {camera.camera_name}
+              </div>
             </div>
           </div>
         );

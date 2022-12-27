@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Popup from "reactjs-popup";
-import avatarPng from "../../../assets/avatar.jpg";
 import axios from "../../../axios-config";
 import { logout } from "../../../store/auth";
 import { showTopMenu } from "../../../store/top-menu";
@@ -9,7 +8,11 @@ import { showTopMenu } from "../../../store/top-menu";
 function Setting() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const [avatar, setAvatar] = useState(avatarPng);
+  const [avatar, setAvatar] = useState(null);
+  const [logger, setLogger] = useState({
+    message: "",
+    type: "",
+  });
 
   const onHandlerChangeAvatar = (e) => {
     //convert avatar to base64 string
@@ -26,16 +29,37 @@ function Setting() {
 
     let userProfile = {};
 
-    if (e.target[0].value !== "") {
+    const avatarInput = e.target[0].value;
+    const oldPasswordInput = e.target[1].value;
+    const newPasswordInput = e.target[2].value;
+    const confirmPasswordInput = e.target[3].value;
+
+    if (avatarInput !== "") {
       userProfile.avatar = avatar;
     }
 
-    if (e.target[2].value !== "" && e.target[2].value === e.target[3].value) {
-      userProfile.password = e.target[2].value;
+    if (oldPasswordInput !== "") {
+      userProfile.old_password = oldPasswordInput;
+    }
+
+    if (newPasswordInput !== "") {
+      if (newPasswordInput === confirmPasswordInput) {
+        userProfile.new_password = newPasswordInput;
+        setLogger({
+          message: "",
+          type: "",
+        });
+      } else {
+        setLogger({
+          message: "Password not match",
+          type: "error",
+        });
+        return;
+      }
     }
 
     const result = await axios.put("auth/profile", userProfile);
-    console.log(result);
+    setLogger(result.data);
   };
 
   useEffect(() => {
@@ -147,6 +171,20 @@ function Setting() {
                       placeholder="Confirm new password"
                     />
                   </div>
+
+                  <span
+                    className="text-[12px]"
+                    style={{
+                      color:
+                        logger.type === "success"
+                          ? "#00B87C"
+                          : logger.type === "error"
+                          ? "#FF406E"
+                          : "#FF406E",
+                    }}
+                  >
+                    {logger.message}
+                  </span>
 
                   <div className="flex items-center justify-center">
                     <button

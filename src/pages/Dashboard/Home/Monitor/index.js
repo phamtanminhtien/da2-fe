@@ -110,7 +110,7 @@ function Monitor() {
   });
 
   const onHandlerTakePhoto = () => {
-    console.log(cameraAPI.background);
+    console.log(cameraAPI.data);
   };
 
   const onHandlerSetAlarm = (e) => {
@@ -131,13 +131,9 @@ function Monitor() {
   }, [id]);
 
   useEffect(() => {
-    console.log(alarm);
-  }, [alarm]);
-
-  useEffect(() => {
     dispatch(
       showTopMenu({
-        title: cameraAPI.name,
+        title: cameraAPI.camera_name,
         back: true,
         leftText: "home",
         leftLink: "/home",
@@ -208,14 +204,14 @@ function Monitor() {
                     History emotion
                   </div>
                   <div className="content max-h-96 overflow-y-scroll">
-                    <ul class="flex max-w-md list-inside flex-col gap-3 space-y-1 text-gray-500 dark:text-gray-400">
+                    <ul className="flex max-w-md list-inside flex-col gap-3 space-y-1 text-gray-500 dark:text-gray-400">
                       {
                         //I want sort emotions by timestamp
                         emotionsAPIDefault
                           .sort((a, b) => b.timestamp - a.timestamp)
                           .map((emotion) => {
                             return (
-                              <li class="flex items-center justify-between px-3">
+                              <li className="flex items-center justify-between px-3">
                                 {convertEmotion(emotion.emotion)}
                                 <span>
                                   {convertTimestamp(emotion.timestamp)}
@@ -273,8 +269,7 @@ function Monitor() {
                 &times;
               </button>
               <div className="header p-2 text-lg font-bold text-[#FF406E]">
-                {" "}
-                Set alarm{" "}
+                Set alarm
               </div>
               <div className="content flex h-20 w-full items-center justify-between p-5">
                 <input
@@ -285,9 +280,9 @@ function Monitor() {
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
-                    value={alarm.toggle}
+                    checked={alarm.toggle}
                     className="peer sr-only"
-                    onClick={onHandlerToggleAlarm}
+                    onChange={onHandlerToggleAlarm}
                   />
                   <div className="peer-focus:ring-red-40000 peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-0.5 after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-red-500 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 dark:border-gray-400 dark:bg-gray-400 dark:peer-focus:ring-red-600"></div>
                 </label>
