@@ -1,23 +1,69 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { login as loginAction } from "../../store/auth";
+import { login } from "../../service/authService";
 import { showTopMenu } from "../../store/top-menu";
 
 function Login() {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const [account, setAccount] = useState({
+    username: "",
+    password: "",
+  });
+  const [valid, setValid] = useState({});
+
+  const onHandlerUsername = (e) => {
+    setAccount({ ...account, username: e.target.value });
+    setValid({ ...valid, username: undefined });
+  };
+
+  const onHandlerPassword = (e) => {
+    setAccount({ ...account, password: e.target.value });
+    setValid({ ...valid, password: undefined });
+  };
+
+  const onHandlerSubmitted = async () => {
+    if (account.username && account.password) {
+      try {
+        const res = await login(account);
+        dispatch(loginAction(res.data));
+      } catch (error) {
+        setValid({
+          username: "Invalid username",
+          password: "Invalid password",
+        });
+        console.log(error);
+      }
+      // history.push("/dashboard/home");
+    } else if (!account.username && !account.password) {
+      setValid({
+        username: "Please input username",
+        password: "Please input password",
+      });
+    } else {
+      if (!account.username) {
+      }
+      if (!account.password) {
+        setValid({ ...valid, password: "Please input password" });
+      }
+    }
+  };
+
   useEffect(() => {
     dispatch(
       showTopMenu({
-        title: "Login",
+        title: "Sign In",
         back: true,
-        rightText: "Register",
-        rightLink: "/register",
+        leftText: "",
+        leftLink: "/",
+        rightText: "Sign Up",
+        rightLink: "/signup",
       })
     );
-  });
+  }, []);
+
   return (
-    <div className="p-8 flex-1 flex flex-col">
+    <div className="mt-32 flex flex-1 flex-col p-8">
       <h1 className="text-6xl font-bold">
         Sign in
         <br />
@@ -25,20 +71,27 @@ function Login() {
       </h1>
       <div className="">
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
-          placeholder="Email"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
+          placeholder="Username"
+          onChange={onHandlerUsername}
         />
+        {valid.username ? (
+          <p className="pt-1 text-xs text-red-600">{valid.username}</p>
+        ) : null}
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
           placeholder="Password"
+          onChange={onHandlerPassword}
+          type="password"
         />
+        {valid.password ? (
+          <p className="pt-1 text-xs text-red-600">{valid.password}</p>
+        ) : null}
       </div>
-      <div className="flex-1 flex justify-center items-center">
+      <div className="flex flex-1 items-center justify-center">
         <div
-          className="w-24 h-24 bg-gray-300 rounded-full flex justify-center items-center"
-          onClick={() => {
-            history.push("/dashboard/setting");
-          }}
+          className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-300"
+          onClick={onHandlerSubmitted}
         >
           <svg
             width="42"

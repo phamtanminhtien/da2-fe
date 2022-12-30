@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 
 const TAB = [
   {
@@ -7,8 +7,8 @@ const TAB = [
     id: "home",
   },
   {
-    name: "Dashboard",
-    id: "dashboard",
+    name: "Message",
+    id: "message",
   },
   {
     name: "Setting",
@@ -17,12 +17,18 @@ const TAB = [
 ];
 
 function BottomMenu() {
-  const [currentTab, setCurrentTab] = React.useState(TAB[0].id);
+  const history = useHistory();
+  const [currentTab, setCurrentTab] = useState(TAB[0].id);
+
+  useEffect(() => {
+    // path: /dashboard/ 12 character
+    setCurrentTab(history.location.pathname.substring(11));
+  }, [history.location.pathname]);
 
   return (
-    <div className="border-t border-gray-300 px-8 py-4 flex justify-between">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex h-24 w-full items-center justify-between border-t border-gray-300 bg-white px-8 py-4">
       <Link
-        className="w-[40px] h-[40px] flex items-center justify-center rounded-md"
+        className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
           backgroundColor: currentTab === TAB[0].id ? "#FF406E" : "#fff",
           width: currentTab === TAB[0].id ? "80px" : "40px",
@@ -31,6 +37,7 @@ function BottomMenu() {
         onClick={() => {
           setCurrentTab(TAB[0].id);
         }}
+        to={TAB[0].id}
       >
         <svg
           style={{
@@ -50,10 +57,11 @@ function BottomMenu() {
         </svg>
       </Link>
       <Link
+        to={TAB[1].id}
         onClick={() => {
           setCurrentTab(TAB[1].id);
         }}
-        className="w-[40px] h-[40px] flex items-center justify-center rounded-md"
+        className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
           backgroundColor: currentTab === TAB[1].id ? "#FF406E" : "#fff",
           width: currentTab === TAB[1].id ? "80px" : "40px",
@@ -78,10 +86,11 @@ function BottomMenu() {
         </svg>
       </Link>
       <Link
+        to={TAB[2].id}
         onClick={() => {
           setCurrentTab(TAB[2].id);
         }}
-        className="w-[40px] h-[40px] flex items-center justify-center rounded-md"
+        className="flex h-[40px] w-[40px] items-center justify-center rounded-md"
         style={{
           backgroundColor: currentTab === TAB[2].id ? "#FF406E" : "#fff",
           transition: "all 0.2s cubic-bezier(0.62, -0.09, 0.9, 1.4) 0s",

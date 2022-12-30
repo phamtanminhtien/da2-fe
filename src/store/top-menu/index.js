@@ -4,16 +4,20 @@ const topMenuSlice = createSlice({
   name: "topMenu",
   initialState: {
     show: false,
-    title: "Home",
+    title: "Welcome",
     back: true,
-    rightText: "SignIn",
-    rightLink: "/signin",
+    leftText: "",
+    leftLink: "/",
+    rightText: "",
+    rightLink: "/",
   },
   reducers: {
     showTopMenu: (state, action) => {
       state.show = true;
       state.title = action.payload.title;
       state.back = action.payload.back;
+      state.leftText = action.payload.leftText;
+      state.leftLink = action.payload.leftLink;
       state.rightText = action.payload.rightText;
       state.rightLink = action.payload.rightLink;
     },

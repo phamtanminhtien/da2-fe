@@ -1,21 +1,92 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../store/top-menu";
+import { register } from "../../service/authService";
 
 function Register() {
+  const history = useHistory();
   const dispatch = useDispatch();
+  const [account, setAccount] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [valid, setValid] = useState({});
+
+  const onHandlerUsername = (e) => {
+    setAccount({ ...account, username: e.target.value });
+    setValid({ ...valid, username: undefined });
+  };
+
+  const onHandlerPassword = (e) => {
+    setAccount({ ...account, password: e.target.value });
+    setValid({ ...valid, password: undefined });
+  };
+
+  const onHandlerConfirmPassword = (e) => {
+    setAccount({ ...account, confirmPassword: e.target.value });
+    setValid({ ...valid, confirmPassword: undefined });
+  };
+
+  const validConfimPassword = (pass, confirmPass) => {
+    if (pass === confirmPass) {
+      return true;
+    } else {
+      setValid({ ...valid, confirmPassword: "Invalid confirm password" });
+      return false;
+    }
+  };
+
+  const onHandlerSubmitted = async () => {
+    if (account.username && account.password) {
+      if (!validConfimPassword(account.password, account.confirmPassword))
+        return;
+      try {
+        const res = await register(account);
+        console.log(res.data);
+        history.push("/signin");
+      } catch (error) {
+        setValid({
+          username: "Invalid username",
+          password: "Invalid password",
+        });
+        console.log(error);
+      }
+      // history.push("/dashboard/home");
+    } else if (
+      !account.username &&
+      !account.password &&
+      !account.confirmPassword
+    ) {
+      setValid({
+        username: "Please input username",
+        password: "Please input password",
+        confirmPassword: "Please input confirm password",
+      });
+    } else {
+      if (!account.username) {
+      }
+      if (!account.password) {
+        setValid({ ...valid, password: "Please input password" });
+      }
+    }
+  };
+
   useEffect(() => {
     dispatch(
       showTopMenu({
-        title: "Register",
+        title: "Sign Up",
         back: true,
-        rightText: "Login",
-        rightLink: "/login",
+        leftText: "",
+        leftLink: "/",
+        rightText: "Sign In",
+        rightLink: "/signin",
       })
     );
   });
   return (
-    <div className="p-8 flex-1 flex flex-col">
+    <div className="mt-32 flex flex-1 flex-col p-8">
       <h1 className="text-6xl font-bold">
         Sign in
         <br />
@@ -23,20 +94,37 @@ function Register() {
       </h1>
       <div className="">
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
-          placeholder="Email"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
+          placeholder="Username"
+          onChange={onHandlerUsername}
         />
+        {valid.username ? (
+          <p className="pt-1 text-xs text-red-600">{valid.username}</p>
+        ) : null}
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
           placeholder="Password"
+          onChange={onHandlerPassword}
+          type="password"
         />
+        {valid.password ? (
+          <p className="pt-1 text-xs text-red-600">{valid.password}</p>
+        ) : null}
         <input
-          className="w-full p-4 mt-8 border border-gray-300 rounded focus:outline-none focus:border-gray-500 bg-gray-300 placeholder-shown:bg-white"
+          className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
           placeholder="Confirm Password"
+          onChange={onHandlerConfirmPassword}
+          type="password"
         />
+        {valid.confirmPassword ? (
+          <p className="pt-1 text-xs text-red-600">{valid.confirmPassword}</p>
+        ) : null}
       </div>
-      <div className="flex-1 flex justify-center items-center">
-        <div className="w-24 h-24 bg-gray-300 rounded-full flex justify-center items-center">
+      <div className="flex flex-1 items-center justify-center">
+        <div
+          className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-300"
+          onClick={onHandlerSubmitted}
+        >
           <svg
             width="42"
             height="38"
