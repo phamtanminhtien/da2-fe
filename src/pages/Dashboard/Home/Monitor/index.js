@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import io from "socket.io-client";
 import { baseURL } from "../../../../constants";
 import { showTopMenu } from "../../../../store/top-menu";
@@ -96,31 +96,50 @@ const convertEmotion = (emotion) => {
   }
 };
 
+const convertTimestampToHM = (time) => {
+  if (!time) return;
+  if (time.length === 5) return time;
+
+  let date = new Date(time * 1000);
+  let hours = "0" + date.getHours();
+  let minutes = "0" + date.getMinutes();
+  let formattedTime = hours.substr(-2) + ":" + minutes.substr(-2);
+
+  return formattedTime;
+};
+
 let socket;
 
 function Monitor() {
   let { id } = useParams();
-
   const dispatch = useDispatch();
-  const [cameraAPI, setCameraAPI] = useState({});
+  const history = useHistory();
 
-  const [alarm, setAlarm] = useState({
-    alarm: "",
-    toggle: false,
-  });
+  const [cameraAPI, setCameraAPI] = useState({});
+  const [alarm, setAlarm] = useState({});
 
   const onHandlerTakePhoto = () => {
     console.log(cameraAPI.data);
   };
 
+  const onHandlerDeleteCamera = async () => {
+    await axios.delete(`/camera/${id}`);
+    history.goBack();
+  };
+
   const onHandlerSetAlarm = (e) => {
     console.log(e.target.value);
-    setAlarm({ ...alarm, alarm: e.target.value });
+    setAlarm({ ...alarm, alarm_at: e.target.value });
   };
 
   const onHandlerToggleAlarm = (e) => {
-    if (alarm.alarm === "") return;
-    setAlarm({ ...alarm, toggle: e.target.checked });
+    if (alarm.alarm_status === "") return;
+    setAlarm({ ...alarm, alarm_status: e.target.checked });
+    socket.emit("alarm", {
+      camera_id: id,
+      alarm_at: alarm.alarm_at,
+      alarm_status: e.target.checked,
+    });
   };
 
   useEffect(() => {
@@ -146,19 +165,32 @@ function Monitor() {
     socket = io(`${baseURL}/client`, {
       transports: ["websocket"],
     });
+
     socket.on("connect", () => {
       console.log("connected");
     });
+
     socket.on("image", (data) => {
+      console.log(data);
       setCameraAPI({
         ...cameraAPI,
-        background: `data:image/jpg;base64,${data}`,
+        data: data.data,
       });
     });
+
+    socket.on("alarm", (data) => {
+      console.log(data);
+      if (data.camera_id !== id) return;
+      setAlarm({
+        alarm_at: data.alarm_at,
+        alarm_status: data.alarm_status,
+      });
+    });
+
     return () => {
       socket.disconnect();
     };
-  }, [cameraAPI]);
+  }, [id, cameraAPI]);
 
   return (
     <div className="mt-32 flex flex-row flex-wrap justify-center gap-8 p-10">
@@ -168,9 +200,7 @@ function Monitor() {
           style={{
             backgroundImage: `url(data:image/jpg;base64,${cameraAPI.data})`,
           }}
-        >
-          {/* Image from camera */}
-        </div>
+        ></div>
 
         <div className="flex w-full flex-row items-center justify-between">
           <div className="text-lg text-gray-800">
@@ -244,6 +274,58 @@ function Monitor() {
           trigger={
             <button className="button">
               <svg
+                width="20"
+                height="24"
+                viewBox="0 0 20 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5.43742 21C5.0902 21 4.79506 20.8542 4.552 20.5625C4.30895 20.2708 4.18742 19.9167 4.18742 19.5V5.25H3.33325V3.75H7.24992V3H12.7499V3.75H16.6666V5.25H15.8124V19.5C15.8124 19.9 15.6874 20.25 15.4374 20.55C15.1874 20.85 14.8958 21 14.5624 21H5.43742ZM14.5624 5.25H5.43742V19.5H14.5624V5.25ZM7.64575 17.35H8.89575V7.375H7.64575V17.35ZM11.1041 17.35H12.3541V7.375H11.1041V17.35ZM5.43742 5.25V19.5V5.25Z"
+                  fill="#ACAAAA"
+                />
+              </svg>
+            </button>
+          }
+          modal
+          nested
+        >
+          {(close) => (
+            <div className="modal">
+              <button
+                className="close absolute top-[-10px] right-[-10px] flex h-8 w-8 items-center justify-center rounded-full bg-white p-4 text-xl text-[#FF406E] "
+                onClick={close}
+              >
+                &times;
+              </button>
+              <div className="header p-2 text-lg font-bold text-[#FF406E]">
+                Are you sure you want to delete this camera?
+              </div>
+              <div className="content flex h-20 w-full items-center justify-center gap-20 p-5">
+                <button
+                  className="button rounded bg-[#FF406E] py-2 px-4 font-bold text-white"
+                  onClick={() => {
+                    close();
+                  }}
+                >
+                  No
+                </button>
+                <button
+                  className="button rounded border border-[#FF406E] bg-white py-2 px-4 font-bold text-[#FF406E]"
+                  onClick={onHandlerDeleteCamera}
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          )}
+        </Popup>
+
+        <Popup
+          className="cursor-pointer rounded-xl"
+          trigger={
+            <button className="button">
+              <svg
                 width="48"
                 height="48"
                 viewBox="0 0 48 48"
@@ -275,12 +357,12 @@ function Monitor() {
                 <input
                   type="time"
                   onChange={onHandlerSetAlarm}
-                  value={alarm.alarm}
+                  value={convertTimestampToHM(alarm.alarm_at)}
                 ></input>
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
-                    checked={alarm.toggle}
+                    checked={alarm.alarm_status}
                     className="peer sr-only"
                     onChange={onHandlerToggleAlarm}
                   />
