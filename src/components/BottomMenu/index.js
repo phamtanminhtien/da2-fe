@@ -4,15 +4,15 @@ import { Link, useHistory } from "react-router-dom";
 const TAB = [
   {
     name: "Home",
-    id: "home",
+    id: "/dashboard/home",
   },
   {
     name: "Message",
-    id: "message",
+    id: "/dashboard/message",
   },
   {
     name: "Setting",
-    id: "setting",
+    id: "/dashboard/setting",
   },
 ];
 
