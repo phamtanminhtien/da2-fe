@@ -7,6 +7,9 @@ import { showTopMenu } from "../../../../store/top-menu";
 // import { camerasAPIDefault } from "../../Home";
 import Popup from "reactjs-popup";
 import axios from "../../../../axios-config";
+import { updateCamera, getCamera } from "../../../../service/cameraService";
+import { getImage } from "../../../../service/imageService";
+import dayjs from "dayjs";
 
 const emotionsAPIDefault = [
   {
@@ -70,6 +73,37 @@ const emotionsAPIDefault = [
     emotion: "neutral",
   },
 ];
+// (0=Angry, 1=Disgust, 2=Fear, 3=Happy, 4=Sad, 5=Surprise, 6=Neutral)
+const emotionsAPI = [
+  {
+    value: 0,
+    label: "😡 Angry",
+  },
+  {
+    value: 1,
+    label: "Disgust",
+  },
+  {
+    value: 2,
+    label: "Fear",
+  },
+  {
+    value: 3,
+    label: "😊 Happy",
+  },
+  {
+    value: 4,
+    label: "Sad",
+  },
+  {
+    value: 5,
+    label: "Surprise",
+  },
+  {
+    value: 6,
+    label: "😐 Neutral",
+  },
+];
 
 const convertTimestamp = (timestamp) => {
   let date = new Date(timestamp);
@@ -81,33 +115,63 @@ const convertTimestamp = (timestamp) => {
   return formattedTime;
 };
 
-const convertEmotion = (emotion) => {
-  switch (emotion) {
-    case "happy":
-      return "😊 Happy";
-    case "neutral":
-      return "😐 Neutral";
-    case "angry":
-      return "😡 Angry";
-    case "sleepy":
-      return "😴 Sleepy";
-    default:
-      return "😐 Neutral";
-  }
-};
-
 let socket;
 
 function Monitor() {
+  const [camera, setCamera] = useState({});
   let { id } = useParams();
 
   const dispatch = useDispatch();
   const [cameraAPI, setCameraAPI] = useState({});
 
+  const [images, setImages] = useState([]);
+  const [totalImages, setTotalImages] = useState(0);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(5);
+
+  useEffect(() => {
+    loadImages();
+  }, [page, size]);
+
+  const loadImages = async () => {
+    try {
+      const res = await getImage({ camera_id: id, page: page, size: size });
+      setImages(res.data.images);
+      setTotalImages(res.data.total);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      (async () => {
+        const res = await getCamera(id);
+        setCameraAPI(res.data);
+      })();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id]);
+
   const [alarm, setAlarm] = useState({
     alarm: "",
     toggle: false,
   });
+
+  useEffect(() => {
+    try {
+      if (alarm.alarm === "") return;
+      (async () => {
+        await updateCamera(id, {
+          alarm_at: alarm.alarm,
+          alarm_status: alarm.toggle,
+        });
+      })();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [alarm, id]);
 
   const onHandlerTakePhoto = () => {
     console.log(cameraAPI.data);
@@ -124,13 +188,6 @@ function Monitor() {
   };
 
   useEffect(() => {
-    (async () => {
-      const res = await axios.get(`/camera/${id}`);
-      setCameraAPI(res.data);
-    })();
-  }, [id]);
-
-  useEffect(() => {
     dispatch(
       showTopMenu({
         title: cameraAPI.camera_name,
@@ -142,6 +199,7 @@ function Monitor() {
     );
   });
 
+  console.log(images);
   useEffect(() => {
     socket = io(`${baseURL}/client`, {
       transports: ["websocket"],
@@ -152,8 +210,10 @@ function Monitor() {
     socket.on("image", (data) => {
       setCameraAPI({
         ...cameraAPI,
+        ...data,
         background: `data:image/jpg;base64,${data}`,
       });
+      loadImages();
     });
     return () => {
       socket.disconnect();
@@ -181,8 +241,8 @@ function Monitor() {
           </div>
           <div className="text-3xl font-bold text-black">
             {
-              emotionsAPIDefault.sort((a, b) => b.timestamp - a.timestamp)[0]
-                .emotion
+              emotionsAPI?.find((emotion) => emotion.value == cameraAPI.emotion)
+                ?.label
             }
           </div>
           <div className="text-sm text-gray-400">
@@ -207,18 +267,22 @@ function Monitor() {
                     <ul className="flex max-w-md list-inside flex-col gap-3 space-y-1 text-gray-500 dark:text-gray-400">
                       {
                         //I want sort emotions by timestamp
-                        emotionsAPIDefault
-                          .sort((a, b) => b.timestamp - a.timestamp)
-                          .map((emotion) => {
-                            return (
-                              <li className="flex items-center justify-between px-3">
-                                {convertEmotion(emotion.emotion)}
-                                <span>
-                                  {convertTimestamp(emotion.timestamp)}
-                                </span>
-                              </li>
-                            );
-                          })
+                        images.map((image) => {
+                          return (
+                            <li className="flex items-center justify-between px-3">
+                              {
+                                emotionsAPI?.find(
+                                  (emotion) => emotion.value == image.emotion
+                                )?.label
+                              }
+                              <span>
+                                {dayjs(image.created_at).format(
+                                  "DD/MM/YYYY HH:mm"
+                                )}
+                              </span>
+                            </li>
+                          );
+                        })
                       }
                     </ul>
                   </div>
@@ -273,7 +337,7 @@ function Monitor() {
               </div>
               <div className="content flex h-20 w-full items-center justify-between p-5">
                 <input
-                  type="time"
+                  type="datetime-local"
                   onChange={onHandlerSetAlarm}
                   value={alarm.alarm}
                 ></input>

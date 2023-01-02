@@ -1,6 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { showTopMenu } from "../../../store/top-menu";
+import { getAllCamera } from "../../../service/cameraService";
+import { createMess, getMess } from "../../../service/messService";
+import dayjs from "dayjs";
 
 const convertTimestamp = (timestamp) => {
   const date = new Date(timestamp);
@@ -48,6 +51,7 @@ const messages = [
 ];
 
 function Message() {
+  const [cameras, setCameras] = useState([]);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(
@@ -60,6 +64,54 @@ function Message() {
       })
     );
   });
+  const [camera, setCamera] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await getAllCamera();
+        setCameras(data);
+        setCamera(data[0].camera_id);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (camera) {
+      loadMess();
+    }
+  }, [camera]);
+
+  const loadMess = async () => {
+    try {
+      const { data } = await getMess({ camera_id: camera });
+      console.log(data);
+      setMessages(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const { data } = await createMess({
+        camera_id: camera,
+        text: message,
+      });
+      console.log(data);
+      setMessage("");
+      loadMess();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="mt-32 flex flex-1 flex-col justify-between p-5 ">
       <div className="fixed top-32 left-0 right-0 bg-white px-5 py-2">
@@ -67,11 +119,21 @@ function Message() {
           <div className="flex items-center justify-center pl-3 font-bold">
             Room ID
           </div>
-          <select className="h-full flex-1 bg-[#D9D9D9] px-5 outline-none">
-            <option value="volvo">Volvo</option>
-            <option value="saab">Saab</option>
-            <option value="mercedes">Mercedes</option>
-            <option value="audi">Audi</option>
+          <select
+            className="h-full flex-1 bg-[#D9D9D9] px-5 outline-none"
+            onChange={(e) => {
+              setCamera(e.target.value);
+            }}
+            value={camera}
+          >
+            {cameras &&
+              cameras.map((camera) => {
+                return (
+                  <option
+                    value={camera.camera_id}
+                  >{`ID: ${camera.camera_id} - ${camera.camera_name}`}</option>
+                );
+              })}
           </select>
         </form>
       </div>
@@ -82,10 +144,10 @@ function Message() {
             return (
               <div className="gap-1">
                 <div className="text-right text-xs text-gray-500">
-                  {convertTimestamp(message.timestamp)}
+                  {dayjs(message.create_at).format("DD/MM/YYYY HH:mm:ss")}
                 </div>
                 <div className="rounded-xl bg-[#D9D9D9] bg-opacity-40 px-5 py-2 text-right">
-                  {message.content}
+                  {message.text}
                 </div>
               </div>
             );
@@ -93,8 +155,17 @@ function Message() {
       </div>
 
       <div className="fixed bottom-24 left-0 right-0 bg-white px-5 py-2">
-        <form className="flex h-[60px] w-full rounded-lg border-[#FF406E] border-opacity-30 bg-[#D9D9D9] p-1 hover:border-2">
-          <input className="h-full flex-1 bg-[#D9D9D9] pl-3 outline-none" />
+        <form
+          className="flex h-[60px] w-full rounded-lg border-[#FF406E] border-opacity-30 bg-[#D9D9D9] p-1 hover:border-2"
+          onSubmit={handleSubmit}
+        >
+          <input
+            className="h-full flex-1 bg-[#D9D9D9] pl-3 outline-none"
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
+          />
           <button className="flex items-center justify-center p-3">
             <svg
               width="22"
