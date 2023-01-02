@@ -89,7 +89,6 @@ function Message() {
   const loadMess = async () => {
     try {
       const { data } = await getMess({ camera_id: camera });
-      console.log(data);
       setMessages(data);
     } catch (error) {
       console.log(error);
@@ -104,7 +103,6 @@ function Message() {
         camera_id: camera,
         text: message,
       });
-      console.log(data);
       setMessage("");
       loadMess();
     } catch (error) {
