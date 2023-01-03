@@ -11,3 +11,7 @@ export const getCamera = async (id) => {
 export const getAllCamera = async () => {
   return await axios.get(`/camera`);
 };
+
+export const deleteCamera = async (id) => {
+  return await axios.delete(`/camera/${id}`);
+};

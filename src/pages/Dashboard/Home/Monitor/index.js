@@ -7,7 +7,11 @@ import { showTopMenu } from "../../../../store/top-menu";
 // import { camerasAPIDefault } from "../../Home";
 import Popup from "reactjs-popup";
 import axios from "../../../../axios-config";
-import { updateCamera, getCamera } from "../../../../service/cameraService";
+import {
+  updateCamera,
+  getCamera,
+  deleteCamera,
+} from "../../../../service/cameraService";
 import { getImage } from "../../../../service/imageService";
 import dayjs from "dayjs";
 
@@ -81,11 +85,11 @@ const emotionsAPI = [
   },
   {
     value: 1,
-    label: "Disgust",
+    label: "🤢 Disgust",
   },
   {
     value: 2,
-    label: "Fear",
+    label: "😨 Fear",
   },
   {
     value: 3,
@@ -93,11 +97,11 @@ const emotionsAPI = [
   },
   {
     value: 4,
-    label: "Sad",
+    label: "🥺 Sad",
   },
   {
     value: 5,
-    label: "Surprise",
+    label: "😯 Surprise",
   },
   {
     value: 6,
@@ -187,6 +191,15 @@ function Monitor() {
     setAlarm({ ...alarm, toggle: e.target.checked });
   };
 
+  const onHandlerDeleteCamera = async () => {
+    try {
+      await deleteCamera(id);
+      window.location.href = "/dashboard/home";
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     dispatch(
       showTopMenu({
@@ -215,6 +228,11 @@ function Monitor() {
       });
       loadImages();
     });
+
+    socket.on("alarm", (data) => {
+      console.log(data);
+    });
+
     return () => {
       socket.disconnect();
     };
@@ -302,6 +320,58 @@ function Monitor() {
             />
           </svg>
         </div>
+
+        <Popup
+          className="cursor-pointer rounded-xl"
+          trigger={
+            <button className="button">
+              <svg
+                width="20"
+                height="24"
+                viewBox="0 0 20 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5.43742 21C5.0902 21 4.79506 20.8542 4.552 20.5625C4.30895 20.2708 4.18742 19.9167 4.18742 19.5V5.25H3.33325V3.75H7.24992V3H12.7499V3.75H16.6666V5.25H15.8124V19.5C15.8124 19.9 15.6874 20.25 15.4374 20.55C15.1874 20.85 14.8958 21 14.5624 21H5.43742ZM14.5624 5.25H5.43742V19.5H14.5624V5.25ZM7.64575 17.35H8.89575V7.375H7.64575V17.35ZM11.1041 17.35H12.3541V7.375H11.1041V17.35ZM5.43742 5.25V19.5V5.25Z"
+                  fill="#ACAAAA"
+                />
+              </svg>
+            </button>
+          }
+          modal
+          nested
+        >
+          {(close) => (
+            <div className="modal">
+              <button
+                className="close absolute top-[-10px] right-[-10px] flex h-8 w-8 items-center justify-center rounded-full bg-white p-4 text-xl text-[#FF406E] "
+                onClick={close}
+              >
+                &times;
+              </button>
+              <div className="header p-2 text-lg font-bold text-[#FF406E]">
+                Are you sure you want to delete this camera?
+              </div>
+              <div className="content flex h-20 w-full items-center justify-center gap-20 p-5">
+                <button
+                  className="button rounded bg-[#FF406E] py-2 px-4 font-bold text-white"
+                  onClick={() => {
+                    close();
+                  }}
+                >
+                  No
+                </button>
+                <button
+                  className="button rounded border border-[#FF406E] bg-white py-2 px-4 font-bold text-[#FF406E]"
+                  onClick={onHandlerDeleteCamera}
+                >
+                  Yes
+                </button>
+              </div>
+            </div>
+          )}
+        </Popup>
 
         <Popup
           className="cursor-pointer rounded-xl"
