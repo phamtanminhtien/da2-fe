@@ -89,7 +89,7 @@ function Message() {
   const loadMess = async () => {
     try {
       const { data } = await getMess({ camera_id: camera });
-      setMessages(data);
+      setMessages(data.reverse());
     } catch (error) {
       console.log(error);
     }
@@ -136,13 +136,13 @@ function Message() {
         </form>
       </div>
 
-      <div className="mt-12 mb-32 flex h-full w-full flex-col items-end justify-start gap-4 p-2">
+      <div className="mt-12 mb-36 flex h-full w-full flex-col items-end justify-start gap-4 p-2">
         {messages &&
           messages.map((message, index) => {
             return (
               <div className="gap-1">
                 <div className="text-right text-xs text-gray-500">
-                  {dayjs(message.create_at).format("DD/MM/YYYY HH:mm:ss")}
+                  {dayjs(message.created_at).format("DD/MM/YYYY HH:mm:ss")}
                 </div>
                 <div className="rounded-xl bg-[#D9D9D9] bg-opacity-40 px-5 py-2 text-right">
                   {message.text}
