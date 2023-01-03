@@ -24,7 +24,7 @@ function App() {
     if (auth.user) {
       history.push("/dashboard/home");
     } else {
-      history.push("/signin");
+      history.push("/");
     }
   }, [auth.user, history]);
 

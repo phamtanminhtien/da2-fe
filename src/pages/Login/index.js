@@ -72,7 +72,7 @@ function Login() {
       <div className="">
         <input
           className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
-          placeholder="Email"
+          placeholder="Username"
           onChange={onHandlerUsername}
         />
         {valid.username ? (
@@ -82,6 +82,7 @@ function Login() {
           className="mt-8 w-full rounded border border-gray-300 bg-gray-300 p-4 placeholder-shown:bg-white focus:border-gray-500 focus:outline-none"
           placeholder="Password"
           onChange={onHandlerPassword}
+          type="password"
         />
         {valid.password ? (
           <p className="pt-1 text-xs text-red-600">{valid.password}</p>

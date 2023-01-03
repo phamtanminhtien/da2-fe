@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { showTopMenu } from "../../../store/top-menu";
-import io from "socket.io-client";
-import { baseURL } from "../../../constants";
-import axios from "../../../axios-config";
+import { useHistory } from "react-router-dom";
 import Popup from "reactjs-popup";
+import axios from "../../../axios-config";
+import { showTopMenu } from "../../../store/top-menu";
 
-let socket;
 function Home() {
   const [camerasAPI, setCamerasAPI] = useState([]);
 
@@ -17,8 +14,8 @@ function Home() {
   const onHandlerAddCamera = async (e) => {
     // e.preventDefault();
     const camera = {
-      id: e.target[0].value,
-      name: e.target[1].value,
+      camera_id: e.target[0].value,
+      camera_name: e.target[1].value,
       data: "",
     };
 
@@ -43,26 +40,6 @@ function Home() {
       setCamerasAPI(result.data);
     })();
   }, []);
-
-  useEffect(() => {
-    socket = io(`${baseURL}/client`, {
-      transports: ["websocket"],
-    });
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-    socket.on("image", (data) => {
-      setCamerasAPI(
-        camerasAPI.map((i) => ({
-          ...i,
-          background: `data:image/jpg;base64,${data}`,
-        }))
-      );
-    });
-    return () => {
-      socket.disconnect();
-    };
-  }, [camerasAPI]);
 
   return (
     <div className="mt-32 flex flex-1 flex-row flex-wrap items-start justify-start gap-8 p-10">
