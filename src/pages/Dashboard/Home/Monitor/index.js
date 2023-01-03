@@ -5,78 +5,15 @@ import io from "socket.io-client";
 import { baseURL } from "../../../../constants";
 import { showTopMenu } from "../../../../store/top-menu";
 // import { camerasAPIDefault } from "../../Home";
+import dayjs from "dayjs";
 import Popup from "reactjs-popup";
-import axios from "../../../../axios-config";
 import {
-  updateCamera,
-  getCamera,
   deleteCamera,
+  getCamera,
+  updateCamera,
 } from "../../../../service/cameraService";
 import { getImage } from "../../../../service/imageService";
-import dayjs from "dayjs";
 
-const emotionsAPIDefault = [
-  {
-    timestamp: 1671808600000,
-    emotion: "happy",
-  },
-  {
-    timestamp: 1671808610000,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671808620000,
-    emotion: "angry",
-  },
-  {
-    timestamp: 1671808630000,
-    emotion: "sleepy",
-  },
-  {
-    timestamp: 1671808640000,
-    emotion: "happy",
-  },
-  {
-    timestamp: 1671808650000,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671808666000,
-    emotion: "angry",
-  },
-  {
-    timestamp: 1671808676000,
-    emotion: "sleepy",
-  },
-  {
-    timestamp: 1671808686417,
-    emotion: "happy",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-];
 // (0=Angry, 1=Disgust, 2=Fear, 3=Happy, 4=Sad, 5=Surprise, 6=Neutral)
 const emotionsAPI = [
   {
@@ -109,20 +46,9 @@ const emotionsAPI = [
   },
 ];
 
-const convertTimestamp = (timestamp) => {
-  let date = new Date(timestamp);
-  let hours = date.getHours();
-  let minutes = "0" + date.getMinutes();
-  let seconds = "0" + date.getSeconds();
-  let formattedTime =
-    "At " + hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
-  return formattedTime;
-};
-
 let socket;
 
 function Monitor() {
-  const [camera, setCamera] = useState({});
   let { id } = useParams();
 
   const dispatch = useDispatch();
@@ -132,6 +58,11 @@ function Monitor() {
   const [totalImages, setTotalImages] = useState(0);
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(5);
+
+  const [alarm, setAlarm] = useState({
+    alarm: "",
+    toggle: false,
+  });
 
   useEffect(() => {
     loadImages();
@@ -157,11 +88,6 @@ function Monitor() {
       console.log(error);
     }
   }, [id]);
-
-  const [alarm, setAlarm] = useState({
-    alarm: "",
-    toggle: false,
-  });
 
   useEffect(() => {
     try {
@@ -212,14 +138,30 @@ function Monitor() {
     );
   });
 
-  console.log(images);
+  useEffect(() => {
+    //get camera alarm by id
+    (async () => {
+      try {
+        const res = await getCamera(id);
+        setAlarm({
+          alarm: res.data.alarm_at,
+          toggle: res.data.alarm_status,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [id]);
+
   useEffect(() => {
     socket = io(`${baseURL}/client`, {
       transports: ["websocket"],
     });
+
     socket.on("connect", () => {
       console.log("connected");
     });
+
     socket.on("image", (data) => {
       setCameraAPI({
         ...cameraAPI,
@@ -236,7 +178,7 @@ function Monitor() {
     return () => {
       socket.disconnect();
     };
-  }, [cameraAPI]);
+  }, [cameraAPI, alarm]);
 
   return (
     <div className="mt-32 flex flex-row flex-wrap justify-center gap-8 p-10">
@@ -253,14 +195,16 @@ function Monitor() {
         <div className="flex w-full flex-row items-center justify-between">
           <div className="text-lg text-gray-800">
             {
-              emotionsAPIDefault.sort((a, b) => b.timestamp - a.timestamp)[1]
-                .emotion
+              emotionsAPI?.find(
+                (emotion) => emotion.value === images[1]?.emotion
+              )?.label
             }
           </div>
           <div className="text-3xl font-bold text-black">
             {
-              emotionsAPI?.find((emotion) => emotion.value == cameraAPI.emotion)
-                ?.label
+              emotionsAPI?.find(
+                (emotion) => emotion.value === cameraAPI.emotion
+              )?.label
             }
           </div>
           <div className="text-sm text-gray-400">
@@ -290,7 +234,7 @@ function Monitor() {
                             <li className="flex items-center justify-between px-3">
                               {
                                 emotionsAPI?.find(
-                                  (emotion) => emotion.value == image.emotion
+                                  (emotion) => emotion.value === image.emotion
                                 )?.label
                               }
                               <span>
@@ -409,7 +353,7 @@ function Monitor() {
                 <input
                   type="datetime-local"
                   onChange={onHandlerSetAlarm}
-                  value={alarm.alarm}
+                  value={dayjs(alarm.alarm).format("YYYY-MM-DD HH:mm:ss")}
                 ></input>
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
