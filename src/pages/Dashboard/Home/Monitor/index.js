@@ -1,153 +1,130 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import { baseURL } from "../../../../constants";
 import { showTopMenu } from "../../../../store/top-menu";
 // import { camerasAPIDefault } from "../../Home";
+import dayjs from "dayjs";
 import Popup from "reactjs-popup";
-import axios from "../../../../axios-config";
+import {
+  deleteCamera,
+  getCamera,
+  updateCamera,
+} from "../../../../service/cameraService";
+import { getImage } from "../../../../service/imageService";
 
-const emotionsAPIDefault = [
+// (0=Angry, 1=Disgust, 2=Fear, 3=Happy, 4=Sad, 5=Surprise, 6=Neutral)
+const emotionsAPI = [
   {
-    timestamp: 1671808600000,
-    emotion: "happy",
+    value: 0,
+    label: "😡 Angry",
   },
   {
-    timestamp: 1671808610000,
-    emotion: "neutral",
+    value: 1,
+    label: "🤢 Disgust",
   },
   {
-    timestamp: 1671808620000,
-    emotion: "angry",
+    value: 2,
+    label: "😨 Fear",
   },
   {
-    timestamp: 1671808630000,
-    emotion: "sleepy",
+    value: 3,
+    label: "😊 Happy",
   },
   {
-    timestamp: 1671808640000,
-    emotion: "happy",
+    value: 4,
+    label: "🥺 Sad",
   },
   {
-    timestamp: 1671808650000,
-    emotion: "neutral",
+    value: 5,
+    label: "😯 Surprise",
   },
   {
-    timestamp: 1671808666000,
-    emotion: "angry",
-  },
-  {
-    timestamp: 1671808676000,
-    emotion: "sleepy",
-  },
-  {
-    timestamp: 1671808686417,
-    emotion: "happy",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
-  },
-  {
-    timestamp: 1671708696417,
-    emotion: "neutral",
+    value: 6,
+    label: "😐 Neutral",
   },
 ];
-
-const convertTimestamp = (timestamp) => {
-  let date = new Date(timestamp);
-  let hours = date.getHours();
-  let minutes = "0" + date.getMinutes();
-  let seconds = "0" + date.getSeconds();
-  let formattedTime =
-    "At " + hours + ":" + minutes.substr(-2) + ":" + seconds.substr(-2);
-  return formattedTime;
-};
-
-const convertEmotion = (emotion) => {
-  switch (emotion) {
-    case "happy":
-      return "😊 Happy";
-    case "neutral":
-      return "😐 Neutral";
-    case "angry":
-      return "😡 Angry";
-    case "sleepy":
-      return "😴 Sleepy";
-    default:
-      return "😐 Neutral";
-  }
-};
-
-const convertTimestampToHM = (time) => {
-  if (!time) return;
-  if (time.length === 5) return time;
-
-  let date = new Date(time * 1000);
-  let hours = "0" + date.getHours();
-  let minutes = "0" + date.getMinutes();
-  let formattedTime = hours.substr(-2) + ":" + minutes.substr(-2);
-
-  return formattedTime;
-};
 
 let socket;
 
 function Monitor() {
   let { id } = useParams();
-  const dispatch = useDispatch();
-  const history = useHistory();
 
+  const dispatch = useDispatch();
   const [cameraAPI, setCameraAPI] = useState({});
-  const [alarm, setAlarm] = useState({});
+
+  const [images, setImages] = useState([]);
+  const [totalImages, setTotalImages] = useState(0);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(5);
+
+  const [alarm, setAlarm] = useState({
+    alarm: "",
+    toggle: false,
+  });
+
+  useEffect(() => {
+    loadImages();
+  }, [page, size]);
+
+  const loadImages = async () => {
+    try {
+      const res = await getImage({ camera_id: id, page: page, size: size });
+      setImages(res.data.images);
+      setTotalImages(res.data.total);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      (async () => {
+        const res = await getCamera(id);
+        setCameraAPI(res.data);
+      })();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    try {
+      if (alarm.alarm === "") return;
+      (async () => {
+        await updateCamera(id, {
+          alarm_at: alarm.alarm,
+          alarm_status: alarm.toggle,
+        });
+      })();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [alarm, id]);
 
   const onHandlerTakePhoto = () => {
     console.log(cameraAPI.data);
   };
 
-  const onHandlerDeleteCamera = async () => {
-    await axios.delete(`/camera/${id}`);
-    history.goBack();
-  };
-
   const onHandlerSetAlarm = (e) => {
     console.log(e.target.value);
-    setAlarm({ ...alarm, alarm_at: e.target.value });
+    setAlarm({ ...alarm, alarm: e.target.value });
   };
 
   const onHandlerToggleAlarm = (e) => {
-    if (alarm.alarm_status === "") return;
-    setAlarm({ ...alarm, alarm_status: e.target.checked });
-    socket.emit("alarm", {
-      camera_id: id,
-      alarm_at: alarm.alarm_at,
-      alarm_status: e.target.checked,
-    });
+    if (alarm.alarm === "") return;
+    setAlarm({ ...alarm, toggle: e.target.checked });
   };
 
-  useEffect(() => {
-    (async () => {
-      const res = await axios.get(`/camera/${id}`);
-      setCameraAPI(res.data);
-    })();
-  }, [id]);
+  const onHandlerDeleteCamera = async () => {
+    try {
+      await deleteCamera(id);
+      window.location.href = "/dashboard/home";
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     dispatch(
@@ -162,6 +139,21 @@ function Monitor() {
   });
 
   useEffect(() => {
+    //get camera alarm by id
+    (async () => {
+      try {
+        const res = await getCamera(id);
+        setAlarm({
+          alarm: res.data.alarm_at,
+          toggle: res.data.alarm_status,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [id]);
+
+  useEffect(() => {
     socket = io(`${baseURL}/client`, {
       transports: ["websocket"],
     });
@@ -171,26 +163,22 @@ function Monitor() {
     });
 
     socket.on("image", (data) => {
-      console.log(data);
       setCameraAPI({
         ...cameraAPI,
-        data: data.data,
+        ...data,
+        background: `data:image/jpg;base64,${data}`,
       });
+      loadImages();
     });
 
     socket.on("alarm", (data) => {
       console.log(data);
-      if (data.camera_id !== id) return;
-      setAlarm({
-        alarm_at: data.alarm_at,
-        alarm_status: data.alarm_status,
-      });
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [id, cameraAPI]);
+  }, [cameraAPI, alarm]);
 
   return (
     <div className="mt-32 flex flex-row flex-wrap justify-center gap-8 p-10">
@@ -200,19 +188,23 @@ function Monitor() {
           style={{
             backgroundImage: `url(data:image/jpg;base64,${cameraAPI.data})`,
           }}
-        ></div>
+        >
+          {/* Image from camera */}
+        </div>
 
         <div className="flex w-full flex-row items-center justify-between">
           <div className="text-lg text-gray-800">
             {
-              emotionsAPIDefault.sort((a, b) => b.timestamp - a.timestamp)[1]
-                .emotion
+              emotionsAPI?.find(
+                (emotion) => emotion.value === images[1]?.emotion
+              )?.label
             }
           </div>
           <div className="text-3xl font-bold text-black">
             {
-              emotionsAPIDefault.sort((a, b) => b.timestamp - a.timestamp)[0]
-                .emotion
+              emotionsAPI?.find(
+                (emotion) => emotion.value === cameraAPI.emotion
+              )?.label
             }
           </div>
           <div className="text-sm text-gray-400">
@@ -237,18 +229,22 @@ function Monitor() {
                     <ul className="flex max-w-md list-inside flex-col gap-3 space-y-1 text-gray-500 dark:text-gray-400">
                       {
                         //I want sort emotions by timestamp
-                        emotionsAPIDefault
-                          .sort((a, b) => b.timestamp - a.timestamp)
-                          .map((emotion) => {
-                            return (
-                              <li className="flex items-center justify-between px-3">
-                                {convertEmotion(emotion.emotion)}
-                                <span>
-                                  {convertTimestamp(emotion.timestamp)}
-                                </span>
-                              </li>
-                            );
-                          })
+                        images.map((image) => {
+                          return (
+                            <li className="flex items-center justify-between px-3">
+                              {
+                                emotionsAPI?.find(
+                                  (emotion) => emotion.value === image.emotion
+                                )?.label
+                              }
+                              <span>
+                                {dayjs(image.created_at).format(
+                                  "DD/MM/YYYY HH:mm"
+                                )}
+                              </span>
+                            </li>
+                          );
+                        })
                       }
                     </ul>
                   </div>
@@ -355,14 +351,14 @@ function Monitor() {
               </div>
               <div className="content flex h-20 w-full items-center justify-between p-5">
                 <input
-                  type="time"
+                  type="datetime-local"
                   onChange={onHandlerSetAlarm}
-                  value={convertTimestampToHM(alarm.alarm_at)}
+                  value={dayjs(alarm.alarm).format("YYYY-MM-DD HH:mm:ss")}
                 ></input>
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
-                    checked={alarm.alarm_status}
+                    checked={alarm.toggle}
                     className="peer sr-only"
                     onChange={onHandlerToggleAlarm}
                   />
